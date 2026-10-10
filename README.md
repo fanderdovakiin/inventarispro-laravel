@@ -116,7 +116,7 @@ Jalankan pengujian dengan perintah:
 php artisan test
 ```
 
-Hasil pengujian terakhir pada tahap pengembangan: **2 passed, 0 failed**.
+Hasil pengujian otomatis terakhir: 5 passed, 0 failed (12 assertions).
 
 Hasil tersebut mengacu pada pengujian otomatis yang tersedia saat ini, bukan keseluruhan pengujian setiap fitur.
 
