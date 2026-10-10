@@ -53,6 +53,17 @@ Aplikasi manajemen inventaris berbasis Laravel untuk mengelola produk, kategori,
 
 ## 4. Persiapan Instalasi
 
+### Mendapatkan Kode Proyek
+
+Clone repository InventarisPro dari GitHub:
+
+```bash
+git clone https://github.com/fanderdovakiin/inventarispro-laravel.git
+cd inventarispro-laravel
+```
+
+Pastikan terminal berada di folder utama proyek sebelum melanjutkan instalasi dependency, konfigurasi database, dan migrasi.
+
 Pastikan PHP, Composer, dan MySQL tersedia. Untuk lingkungan lokal Windows, XAMPP dapat digunakan.
 
 1. Buat database MySQL bernama `inventory_db` melalui phpMyAdmin.
