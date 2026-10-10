@@ -110,15 +110,20 @@ Akun tersebut hanya untuk pengembangan dan demonstrasi lokal. Ganti password seb
 
 ## 6. Pengujian Otomatis
 
-Jalankan pengujian menggunakan perintah:
+Jalankan pengujian menggunakan perintah `php artisan test`.
 
-```bash
-php artisan test
-```
+Pengujian otomatis mencakup:
 
-Hasil pengujian otomatis terakhir: 5 passed, 0 failed (12 assertions).
+- Pengalihan pengunjung yang belum login ke halaman login.
+- Hak akses Admin dan Staff terhadap halaman pengelolaan data master.
+- Akses Staff ke halaman operasional stok.
+- Transaksi barang masuk dan pencatatan riwayat stok.
+- Transaksi barang keluar dan pencatatan riwayat stok.
+- Penolakan transaksi barang keluar yang melebihi stok tersedia.
 
-Hasil tersebut mengacu pada pengujian otomatis yang tersedia saat ini, bukan keseluruhan pengujian setiap fitur.
+**Hasil pengujian otomatis terakhir: 8 passed, 0 failed (24 assertions).**
+
+Pengujian tersebut mencakup alur yang disebutkan di atas, bukan seluruh kemungkinan kasus pada setiap fitur aplikasi.
 
 ## 7. Catatan Keamanan
 
