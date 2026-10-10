@@ -1,58 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supplier — InventarisPro</title>
+@section('title', 'Pemasok — InventarisPro')
 
+@push('styles')
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Inter, "Segoe UI", sans-serif;
-            background: #f5f7fa;
-            color: #172b43;
-        }
-
-        header {
-            min-height: 68px;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .brand {
-            color: #01498b;
-            font-size: 19px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .logout {
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            background: #fff;
-            color: #334155;
-            cursor: pointer;
-        }
-
-        main {
+        .page-main {
             max-width: 1320px;
             margin: 0 auto;
             padding: 32px 24px;
@@ -147,7 +99,7 @@
             flex: 1;
         }
 
-        input[type="search"] {
+        .search-form input[type="search"] {
             width: min(100%, 350px);
             height: 40px;
             padding: 0 12px;
@@ -158,7 +110,7 @@
             outline: none;
         }
 
-        input[type="search"]:focus {
+        .search-form input[type="search"]:focus {
             border-color: #01498b;
             box-shadow: 0 0 0 3px #01498b18;
         }
@@ -302,11 +254,7 @@
         }
 
         @media (max-width: 650px) {
-            header {
-                padding: 14px 16px;
-            }
-
-            main {
+            .page-main {
                 padding: 24px 14px;
             }
 
@@ -324,9 +272,10 @@
                 width: 100%;
             }
 
-            input[type="search"] {
+            .search-form input[type="search"] {
                 flex: 1;
                 width: auto;
+                min-width: 0;
             }
 
             .pagination {
@@ -335,217 +284,202 @@
             }
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <header>
-        <a href="{{ route('dashboard') }}" class="brand">InventarisPro</a>
+@section('content')
+    <div class="breadcrumb">
+        Dashboard / Data Master / Pemasok
+    </div>
 
-        <div class="header-right">
-            <span>{{ auth()->user()->full_name }}</span>
+    <div class="heading">
+        <div>
+            <h1>Pemasok</h1>
+            <p class="subtitle">
+                Kelola informasi pemasok dan hubungannya dengan produk.
+            </p>
+        </div>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout">Keluar</button>
+        @if (auth()->user()->isAdmin())
+            <a href="{{ route('suppliers.create') }}" class="button button-primary">
+                + Tambah Pemasok
+            </a>
+        @endif
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success" role="status">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-error" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-error" role="alert">
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
+    @endif
+
+    <section class="panel">
+        <div class="toolbar">
+            <form method="GET" action="{{ route('suppliers.index') }}" class="search-form">
+
+                <input type="search" name="search" value="{{ request('search') }}"
+                    placeholder="Cari nama, email, atau telepon pemasok..." aria-label="Cari pemasok">
+
+                <button type="submit" class="button button-primary">
+                    Cari
+                </button>
+
+                @if (request('search'))
+                    <a href="{{ route('suppliers.index') }}" class="button">
+                        Reset
+                    </a>
+                @endif
             </form>
-        </div>
-    </header>
 
-    <main>
-        <div class="breadcrumb">Dashboard / Data Master / Supplier</div>
-
-        <div class="heading">
-            <div>
-                <h1>Supplier</h1>
-                <p class="subtitle">
-                    Kelola informasi pemasok dan hubungannya dengan produk.
-                </p>
-            </div>
-
-            @if (auth()->user()->isAdmin())
-                <a href="{{ route('suppliers.create') }}" class="button button-primary">
-                    + Tambah Supplier
-                </a>
-            @endif
+            <span class="count">
+                {{ $suppliers->total() }} pemasok
+            </span>
         </div>
 
-        @if (session('success'))
-            <div class="alert alert-success" role="status">
-                {{ session('success') }}
-            </div>
-        @endif
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Pemasok</th>
+                        <th>Kontak</th>
+                        <th>Email</th>
+                        <th>Nomor Telepon</th>
+                        <th>Alamat</th>
+                        <th>Jumlah Produk</th>
 
-        @if (session('error'))
-            <div class="alert alert-error" role="alert">
-                {{ session('error') }}
-            </div>
-        @endif
+                        @if (auth()->user()->isAdmin())
+                            <th>Aksi</th>
+                        @endif
+                    </tr>
+                </thead>
 
-        @if ($errors->any())
-            <div class="alert alert-error" role="alert">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
-
-        <section class="panel">
-            <div class="toolbar">
-                <form method="GET" action="{{ route('suppliers.index') }}" class="search-form">
-
-                    <input type="search" name="search" value="{{ request('search') }}"
-                        placeholder="Cari nama, email, atau telepon supplier..." aria-label="Cari supplier">
-
-                    <button type="submit" class="button button-primary">
-                        Cari
-                    </button>
-
-                    @if (request('search'))
-                        <a href="{{ route('suppliers.index') }}" class="button">
-                            Reset
-                        </a>
-                    @endif
-                </form>
-
-                <span class="count">
-                    {{ $suppliers->total() }} supplier
-                </span>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
+                <tbody>
+                    @forelse ($suppliers as $supplier)
                         <tr>
-                            <th>Nama Supplier</th>
-                            <th>Kontak</th>
-                            <th>Email</th>
-                            <th>Nomor Telepon</th>
-                            <th>Alamat</th>
-                            <th>Jumlah Produk</th>
+                            <td>
+                                <span class="supplier-name">
+                                    {{ $supplier->supplier_name }}
+                                </span>
+
+                                <span class="muted">
+                                    ID: {{ $supplier->supplier_id }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ $supplier->contact_info ?: '-' }}
+                            </td>
+
+                            <td>
+                                {{ $supplier->email ?: '-' }}
+                            </td>
+
+                            <td>
+                                {{ $supplier->phone ?: '-' }}
+                            </td>
+
+                            <td>
+                                <span class="muted">
+                                    {{ $supplier->location ?: '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="product-count">
+                                    {{ $supplier->products_count }}
+                                </span>
+                            </td>
 
                             @if (auth()->user()->isAdmin())
-                                <th>Aksi</th>
+                                <td>
+                                    <div class="actions">
+                                        <a href="{{ route('suppliers.edit', $supplier) }}" class="button">
+                                            Edit
+                                        </a>
+
+                                        <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}"
+                                            onsubmit="return confirm('Yakin ingin menghapus pemasok ini? Relasi pemasok akan dilepas sesuai aturan database.')">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="button button-danger">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
                             @endif
                         </tr>
-                    </thead>
-
-                    <tbody>
-                        @forelse ($suppliers as $supplier)
-                            <tr>
-                                <td>
-                                    <span class="supplier-name">
-                                        {{ $supplier->supplier_name }}
-                                    </span>
-
-                                    <span class="muted">
-                                        ID: {{ $supplier->supplier_id }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {{ $supplier->contact_info ?: '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $supplier->email ?: '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $supplier->phone ?: '-' }}
-                                </td>
-
-                                <td>
-                                    <span class="muted">
-                                        {{ $supplier->location ?: '-' }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="product-count">
-                                        {{ $supplier->products_count }}
-                                    </span>
-                                </td>
-
-                                @if (auth()->user()->isAdmin())
-                                    <td>
-                                        <div class="actions">
-                                            <a href="{{ route('suppliers.edit', $supplier) }}" class="button">
-                                                Edit
-                                            </a>
-
-                                            <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}"
-                                                onsubmit="return confirm('Yakin ingin menghapus supplier ini? Relasi pemasok akan dilepas sesuai aturan database.')">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="button button-danger">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                @endif
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="{{ auth()->user()->isAdmin() ? 7 : 6 }}" class="empty">
-                                    <strong>
-                                        @if (request('search'))
-                                            Supplier tidak ditemukan
-                                        @else
-                                            Belum ada supplier
-                                        @endif
-                                    </strong>
-
+                    @empty
+                        <tr>
+                            <td colspan="{{ auth()->user()->isAdmin() ? 7 : 6 }}" class="empty">
+                                <strong>
                                     @if (request('search'))
-                                        Coba kata kunci lainnya.
+                                        Pemasok tidak ditemukan
                                     @else
-                                        Tambahkan supplier untuk mulai mengelola pemasok.
+                                        Belum ada pemasok
                                     @endif
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                </strong>
 
-            @if ($suppliers->hasPages())
-                <div class="pagination">
-                    <span>
-                        Menampilkan {{ $suppliers->firstItem() ?? 0 }}
-                        –{{ $suppliers->lastItem() ?? 0 }}
-                        dari {{ $suppliers->total() }} supplier
-                    </span>
+                                @if (request('search'))
+                                    Coba kata kunci lainnya.
+                                @else
+                                    Tambahkan pemasok untuk mulai mengelola pemasok.
+                                @endif
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-                    <div class="pagination-links">
-                        @if ($suppliers->onFirstPage())
-                            <span>Sebelumnya</span>
+        @if ($suppliers->hasPages())
+            <div class="pagination">
+                <span>
+                    Menampilkan {{ $suppliers->firstItem() ?? 0 }}
+                    –{{ $suppliers->lastItem() ?? 0 }}
+                    dari {{ $suppliers->total() }} pemasok
+                </span>
+
+                <div class="pagination-links">
+                    @if ($suppliers->onFirstPage())
+                        <span>Sebelumnya</span>
+                    @else
+                        <a href="{{ $suppliers->previousPageUrl() }}">
+                            Sebelumnya
+                        </a>
+                    @endif
+
+                    @foreach ($suppliers->getUrlRange(1, $suppliers->lastPage()) as $page => $url)
+                        @if ($page === $suppliers->currentPage())
+                            <span class="current">{{ $page }}</span>
                         @else
-                            <a href="{{ $suppliers->previousPageUrl() }}">
-                                Sebelumnya
-                            </a>
+                            <a href="{{ $url }}">{{ $page }}</a>
                         @endif
+                    @endforeach
 
-                        @foreach ($suppliers->getUrlRange(1, $suppliers->lastPage()) as $page => $url)
-                            @if ($page === $suppliers->currentPage())
-                                <span class="current">{{ $page }}</span>
-                            @else
-                                <a href="{{ $url }}">{{ $page }}</a>
-                            @endif
-                        @endforeach
-
-                        @if ($suppliers->hasMorePages())
-                            <a href="{{ $suppliers->nextPageUrl() }}">
-                                Berikutnya
-                            </a>
-                        @else
-                            <span>Berikutnya</span>
-                        @endif
-                    </div>
+                    @if ($suppliers->hasMorePages())
+                        <a href="{{ $suppliers->nextPageUrl() }}">
+                            Berikutnya
+                        </a>
+                    @else
+                        <span>Berikutnya</span>
+                    @endif
                 </div>
-            @endif
-        </section>
-    </main>
-</body>
-
-</html>
+            </div>
+        @endif
+    </section>
+@endsection

@@ -1,57 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Produk — InventarisPro</title>
+@section('title', 'Tambah Produk — InventarisPro')
 
+@push('styles')
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #f5f7fa;
-            color: #172b43;
-            font-family: Inter, "Segoe UI", sans-serif;
-        }
-
-        header {
-            min-height: 68px;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .brand {
-            color: #01498b;
-            font-size: 19px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .logout {
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        main {
+        .page-main {
             max-width: 960px;
             margin: 0 auto;
             padding: 32px 24px;
@@ -224,11 +177,7 @@
         }
 
         @media (max-width: 600px) {
-            header {
-                padding: 14px 16px;
-            }
-
-            main {
+            .page-main {
                 padding: 24px 14px;
             }
 
@@ -243,45 +192,32 @@
             .field-full {
                 grid-column: auto;
             }
+
+            h1 {
+                font-size: 23px;
+            }
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <header>
-        <a href="{{ route('dashboard') }}" class="brand">InventarisPro</a>
+@section('content')
+    <div class="breadcrumb">
+        Dashboard / Data Master / Produk / Tambah
+    </div>
 
-        <div class="user-area">
-            <span>{{ auth()->user()->full_name }}</span>
+    <h1>Tambah Produk</h1>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout">Keluar</button>
-            </form>
-        </div>
-    </header>
+    <p class="subtitle">
+        Masukkan informasi produk yang akan didaftarkan ke inventory.
+    </p>
 
-    <main>
-        <div class="breadcrumb">
-            Dashboard / Data Master / Produk / Tambah
-        </div>
+    <section class="panel">
+        <h2>Informasi Produk</h2>
 
-        <h1>Tambah Produk</h1>
-
-        <p class="subtitle">
-            Masukkan informasi produk yang akan didaftarkan ke inventory.
+        <p class="panel-description">
+            Lengkapi kode produk, nama, kategori, harga, dan batas minimum stok.
         </p>
 
-        <section class="panel">
-            <h2>Informasi Produk</h2>
-
-            <p class="panel-description">
-                Lengkapi kode produk, nama, kategori, harga, dan batas minimum stok.
-            </p>
-
-            @include('products._form', ['product' => null])
-        </section>
-    </main>
-</body>
-
-</html>
+        @include('products._form', ['product' => null])
+    </section>
+@endsection

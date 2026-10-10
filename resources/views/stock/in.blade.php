@@ -1,73 +1,36 @@
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barang Masuk | InventarisPro</title>
+@section('title', 'Barang Masuk — InventarisPro')
 
+@push('styles')
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6fa;
-            color: #243247;
-        }
-
-        .navbar {
-            background: #01498b;
-            color: white;
-            padding: 18px 5%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .brand {
-            font-size: 21px;
-            font-weight: 700;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-
-        .logout-form {
-            display: inline;
-        }
-
-        .logout-button {
-            border: 1px solid rgba(255,255,255,.6);
-            background: transparent;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 7px;
-            cursor: pointer;
-        }
-
-        .container {
+        .page-main {
             max-width: 850px;
-            margin: 35px auto;
-            padding: 0 20px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+
+        .stock-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            margin-bottom: 28px;
+            padding: 14px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .stock-nav a {
+            color: #475569;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .stock-nav a:hover,
+        .stock-nav a.active {
+            color: #01498b;
+            font-weight: 600;
         }
 
         .page-heading {
@@ -83,6 +46,7 @@
             margin: 0;
             color: #718096;
             line-height: 1.6;
+            font-size: 14px;
         }
 
         .card {
@@ -97,34 +61,44 @@
             margin-bottom: 22px;
         }
 
-        label {
+        .form-group label {
             display: block;
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 9px;
         }
 
-        input,
-        select,
-        textarea {
+        .required {
+            color: #c53030;
+        }
+
+        .card input,
+        .card select,
+        .card textarea {
             width: 100%;
             padding: 12px 13px;
             border: 1px solid #d5dce5;
             border-radius: 8px;
             background: white;
+            font: inherit;
             font-size: 14px;
             color: #243247;
         }
 
-        input:focus,
-        select:focus,
-        textarea:focus {
+        .card input,
+        .card select {
+            min-height: 44px;
+        }
+
+        .card input:focus,
+        .card select:focus,
+        .card textarea:focus {
             outline: none;
             border-color: #01498b;
             box-shadow: 0 0 0 3px rgba(1, 73, 139, .1);
         }
 
-        textarea {
+        .card textarea {
             min-height: 100px;
             resize: vertical;
         }
@@ -148,6 +122,7 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 14px;
+            line-height: 1.6;
         }
 
         .alert-success {
@@ -170,7 +145,9 @@
         }
 
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 11px 17px;
             border-radius: 8px;
             font-size: 14px;
@@ -200,16 +177,16 @@
         }
 
         @media (max-width: 600px) {
-            .container {
-                margin-top: 24px;
-            }
-
-            .card {
-                padding: 20px;
+            .page-main {
+                padding: 24px 14px;
             }
 
             .page-heading h1 {
                 font-size: 24px;
+            }
+
+            .card {
+                padding: 20px;
             }
 
             .form-actions {
@@ -218,156 +195,130 @@
 
             .form-actions .btn {
                 text-align: center;
+                width: 100%;
             }
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <header class="navbar">
-        <div class="brand">InventarisPro</div>
+@section('content')
+    <nav class="stock-nav" aria-label="Navigasi stok">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <a href="{{ route('products.index') }}">Produk</a>
+        <a href="{{ route('stock.in.create') }}" class="active">Barang Masuk</a>
+        <a href="{{ route('stock.out.create') }}">Barang Keluar</a>
+        <a href="{{ route('stock.history') }}">Riwayat Stok</a>
+    </nav>
 
-        <nav class="nav-links">
-            <a href="{{ route('dashboard') }}">Dashboard</a>
-            <a href="{{ route('products.index') }}">Produk</a>
-            <a href="{{ route('stock.in.create') }}">Barang Masuk</a>
-            <a href="{{ route('stock.out.create') }}">Barang Keluar</a>
-            <a href="{{ route('stock.history') }}">Riwayat Stok</a>
+    <div class="page-heading">
+        <h1>Barang Masuk</h1>
+        <p>
+            Catat penerimaan barang untuk menambahkan stok produk
+            dan menyimpan riwayat transaksi.
+        </p>
+    </div>
 
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-button">Keluar</button>
-            </form>
-        </nav>
-    </header>
-
-    <main class="container">
-        <div class="page-heading">
-            <h1>Barang Masuk</h1>
-            <p>
-                Catat penerimaan barang untuk menambahkan stok produk
-                dan menyimpan riwayat transaksi.
-            </p>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
         </div>
+    @endif
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    @if ($errors->any())
+        <div class="alert alert-error">
+            <strong>Data belum dapat disimpan.</strong>
+            <ul style="margin-bottom: 0; padding-left: 20px;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-        @if ($errors->any())
-            <div class="alert alert-error">
-                <strong>Data belum dapat disimpan.</strong>
-                <ul style="margin-bottom: 0; padding-left: 20px;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+    <section class="card">
+        <form action="{{ route('stock.in.store') }}" method="POST">
+            @csrf
+
+            <div class="form-group">
+                <label for="product_id">
+                    Produk <span class="required">*</span>
+                </label>
+
+                <select id="product_id" name="product_id" required>
+                    <option value="">Pilih produk</option>
+
+                    @foreach ($products as $product)
+                        <option value="{{ $product->product_id }}" @selected((string) old('product_id') === (string) $product->product_id)>
+                            {{ $product->sku }} — {{ $product->product_name }}
+                            (Stok saat ini: {{ $product->stock }})
+                        </option>
                     @endforeach
-                </ul>
+                </select>
+
+                @error('product_id')
+                    <span class="field-error">{{ $message }}</span>
+                @enderror
+
+                <span class="help-text">
+                    Pilih produk yang akan ditambahkan stoknya.
+                </span>
             </div>
-        @endif
 
-        <section class="card">
-            <form action="{{ route('stock.in.store') }}" method="POST">
-                @csrf
+            <div class="form-group">
+                <label for="quantity">
+                    Jumlah Barang Masuk <span class="required">*</span>
+                </label>
 
-                <div class="form-group">
-                    <label for="product_id">Produk <span style="color: #c53030;">*</span></label>
+                <input type="number" id="quantity" name="quantity" value="{{ old('quantity') }}" min="1" step="1"
+                    placeholder="Masukkan jumlah barang" required>
 
-                    <select id="product_id" name="product_id" required>
-                        <option value="">Pilih produk</option>
+                @error('quantity')
+                    <span class="field-error">{{ $message }}</span>
+                @enderror
+            </div>
 
-                        @foreach ($products as $product)
-                            <option
-                                value="{{ $product->product_id }}"
-                                @selected((string) old('product_id') === (string) $product->product_id)
-                            >
-                                {{ $product->sku }} — {{ $product->product_name }}
-                                (Stok saat ini: {{ $product->stock }})
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="form-group">
+                <label for="supplier_id">Pemasok</label>
 
-                    @error('product_id')
-                        <span class="field-error">{{ $message }}</span>
-                    @enderror
+                <select id="supplier_id" name="supplier_id">
+                    <option value="">Tidak ditentukan</option>
 
-                    <span class="help-text">
-                        Pilih produk yang akan ditambahkan stoknya.
-                    </span>
-                </div>
+                    @foreach ($suppliers as $supplier)
+                        <option value="{{ $supplier->supplier_id }}" @selected((string) old('supplier_id') === (string) $supplier->supplier_id)>
+                            {{ $supplier->supplier_name }}
+                        </option>
+                    @endforeach
+                </select>
 
-                <div class="form-group">
-                    <label for="quantity">Jumlah Barang Masuk <span style="color: #c53030;">*</span></label>
+                @error('supplier_id')
+                    <span class="field-error">{{ $message }}</span>
+                @enderror
 
-                    <input
-                        type="number"
-                        id="quantity"
-                        name="quantity"
-                        value="{{ old('quantity') }}"
-                        min="1"
-                        step="1"
-                        placeholder="Masukkan jumlah barang"
-                        required
-                    >
+                <span class="help-text">
+                    Pemasok bersifat opsional.
+                </span>
+            </div>
 
-                    @error('quantity')
-                        <span class="field-error">{{ $message }}</span>
-                    @enderror
-                </div>
+            <div class="form-group">
+                <label for="notes">Catatan</label>
 
-                <div class="form-group">
-                    <label for="supplier_id">Pemasok</label>
+                <textarea id="notes" name="notes" maxlength="1000"
+                    placeholder="Contoh: Pembelian barang untuk penambahan stok.">{{ old('notes') }}</textarea>
 
-                    <select id="supplier_id" name="supplier_id">
-                        <option value="">Tidak ditentukan</option>
+                @error('notes')
+                    <span class="field-error">{{ $message }}</span>
+                @enderror
+            </div>
 
-                        @foreach ($suppliers as $supplier)
-                            <option
-                                value="{{ $supplier->supplier_id }}"
-                                @selected((string) old('supplier_id') === (string) $supplier->supplier_id)
-                            >
-                                {{ $supplier->supplier_name }}
-                            </option>
-                        @endforeach
-                    </select>
+            <div class="form-actions">
+                <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                    Batal
+                </a>
 
-                    @error('supplier_id')
-                        <span class="field-error">{{ $message }}</span>
-                    @enderror
-
-                    <span class="help-text">
-                        Pemasok bersifat opsional.
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Catatan</label>
-
-                    <textarea
-                        id="notes"
-                        name="notes"
-                        maxlength="1000"
-                        placeholder="Contoh: Pembelian barang untuk penambahan stok."
-                    >{{ old('notes') }}</textarea>
-
-                    @error('notes')
-                        <span class="field-error">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <div class="form-actions">
-                    <a href="{{ route('dashboard') }}" class="btn btn-secondary">
-                        Batal
-                    </a>
-
-                    <button type="submit" class="btn btn-primary">
-                        Simpan Barang Masuk
-                    </button>
-                </div>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
-```
+                <button type="submit" class="btn btn-primary">
+                    Simpan Barang Masuk
+                </button>
+            </div>
+        </form>
+    </section>
+@endsection

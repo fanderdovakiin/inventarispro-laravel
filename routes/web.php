@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class)
         ->except(['show']);
 
-    Route::resource('suppliers', SupplierController::class);
+    Route::resource('suppliers', SupplierController::class)->except(['show']);
     // Transaksi barang masuk
     Route::get('/stock/in', [
         StockInController::class,

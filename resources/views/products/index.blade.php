@@ -1,56 +1,10 @@
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produk — InventarisPro</title>
+@section('title', 'Produk — InventarisPro')
 
+@push('styles')
     <style>
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: Inter, "Segoe UI", sans-serif;
-            background: #f5f7fa;
-            color: #172b43;
-        }
-
-        header {
-            min-height: 68px;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .brand {
-            color: #01498b;
-            font-size: 19px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        .logout {
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            background: #fff;
-            color: #334155;
-            cursor: pointer;
-        }
-
-        main {
+        .page-main {
             max-width: 1360px;
             margin: 0 auto;
             padding: 32px 24px;
@@ -107,14 +61,18 @@
             color: white;
         }
 
-        .button-primary:hover { background: #003b72; }
+        .button-primary:hover {
+            background: #003b72;
+        }
 
         .button-danger {
             color: #b42318;
             border-color: #fecaca;
         }
 
-        .button-danger:hover { background: #fef2f2; }
+        .button-danger:hover {
+            background: #fef2f2;
+        }
 
         .button-small {
             min-height: 31px;
@@ -147,7 +105,8 @@
             flex: 1;
         }
 
-        input, select {
+        .filter-form input,
+        .filter-form select {
             height: 40px;
             padding: 0 11px;
             border: 1px solid #cbd5e1;
@@ -159,13 +118,16 @@
             outline: none;
         }
 
-        input[name="search"] {
+        .filter-form input[name="search"] {
             width: min(100%, 290px);
         }
 
-        select { max-width: 220px; }
+        .filter-form select {
+            max-width: 220px;
+        }
 
-        input:focus, select:focus {
+        .filter-form input:focus,
+        .filter-form select:focus {
             border-color: #01498b;
             box-shadow: 0 0 0 3px #01498b18;
         }
@@ -196,7 +158,9 @@
             color: #991b1b;
         }
 
-        .table-wrap { overflow-x: auto; }
+        .table-wrap {
+            overflow-x: auto;
+        }
 
         table {
             width: 100%;
@@ -213,21 +177,29 @@
             white-space: nowrap;
         }
 
-        th, td {
+        th,
+        td {
             padding: 14px 16px;
             border-bottom: 1px solid #edf1f5;
             vertical-align: middle;
         }
 
-        tbody tr:hover { background: #fafcff; }
-        tbody tr:last-child td { border-bottom: 0; }
+        tbody tr:hover {
+            background: #fafcff;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: 0;
+        }
 
         .sort-link {
             color: inherit;
             text-decoration: none;
         }
 
-        .sort-link:hover { color: #01498b; }
+        .sort-link:hover {
+            color: #01498b;
+        }
 
         .product-name {
             display: block;
@@ -282,7 +254,9 @@
             gap: 6px;
         }
 
-        .actions form { margin: 0; }
+        .actions form {
+            margin: 0;
+        }
 
         .empty {
             padding: 45px 20px;
@@ -339,8 +313,9 @@
         }
 
         @media (max-width: 760px) {
-            header { padding: 15px 16px; }
-            main { padding: 24px 14px; }
+            .page-main {
+                padding: 24px 14px;
+            }
 
             .heading {
                 align-items: flex-start;
@@ -352,9 +327,19 @@
                 flex-direction: column;
             }
 
-            .filter-form { width: 100%; }
-            input[name="search"] { flex: 1; width: auto; }
-            select { max-width: 100%; }
+            .filter-form {
+                width: 100%;
+            }
+
+            .filter-form input[name="search"] {
+                flex: 1;
+                width: auto;
+                min-width: 120px;
+            }
+
+            .filter-form select {
+                max-width: 100%;
+            }
 
             .pagination {
                 align-items: flex-start;
@@ -362,23 +347,9 @@
             }
         }
     </style>
-</head>
+@endpush
 
-<body>
-<header>
-    <a href="{{ route('dashboard') }}" class="brand">InventarisPro</a>
-
-    <div class="header-right">
-        <span>{{ auth()->user()->full_name }}</span>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="logout">Keluar</button>
-        </form>
-    </div>
-</header>
-
-<main>
+@section('content')
     <div class="breadcrumb">Dashboard / Data Master / Produk</div>
 
     <div class="heading">
@@ -390,8 +361,7 @@
         </div>
 
         @if (auth()->user()->isAdmin())
-            <a href="{{ route('products.create') }}"
-               class="button button-primary">
+            <a href="{{ route('products.create') }}" class="button button-primary">
                 + Tambah Produk
             </a>
         @endif
@@ -419,26 +389,19 @@
 
     <section class="panel">
         <div class="filters">
-            <form method="GET"
-                  action="{{ route('products.index') }}"
-                  class="filter-form">
+            <form method="GET" action="{{ route('products.index') }}" class="filter-form">
 
-                <input
-                    type="search"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Cari nama produk atau SKU..."
-                    aria-label="Cari produk"
-                >
+                <input type="search" name="search" value="{{ request('search') }}"
+                    placeholder="Cari nama produk atau SKU..." aria-label="Cari produk">
 
                 <select name="category_id" aria-label="Filter kategori">
                     <option value="">Semua kategori</option>
 
                     @foreach ($categories as $category)
-                        <option
-                            value="{{ $category->category_id }}"
-                            @selected((string) request('category_id') === (string) $category->category_id)
-                        >
+                        <option value="{{ $category->category_id }}" @selected(
+                            (string) request('category_id')
+                            === (string) $category->category_id
+                        )>
                             {{ $category->category_name }}
                         </option>
                     @endforeach
@@ -449,8 +412,7 @@
                 </button>
 
                 @if (request()->query())
-                    <a href="{{ route('products.index') }}"
-                       class="button">
+                    <a href="{{ route('products.index') }}" class="button">
                         Reset
                     </a>
                 @endif
@@ -466,12 +428,11 @@
                 <thead>
                     <tr>
                         <th>
-                            <a class="sort-link"
-                               href="{{ route('products.index', array_merge(request()->query(), [
-                                   'sort' => 'product_name',
-                                   'direction' => $sort === 'product_name' && $direction === 'asc' ? 'desc' : 'asc',
-                                   'page' => 1,
-                               ])) }}">
+                            <a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), [
+        'sort' => 'product_name',
+        'direction' => $sort === 'product_name' && $direction === 'asc' ? 'desc' : 'asc',
+        'page' => 1,
+    ])) }}">
                                 Produk
                                 @if ($sort === 'product_name')
                                     {{ $direction === 'asc' ? '↑' : '↓' }}
@@ -480,16 +441,14 @@
                         </th>
 
                         <th>Kategori</th>
-
-                        <th>Supplier</th>
+                        <th>Pemasok</th>
 
                         <th>
-                            <a class="sort-link"
-                               href="{{ route('products.index', array_merge(request()->query(), [
-                                   'sort' => 'price',
-                                   'direction' => $sort === 'price' && $direction === 'asc' ? 'desc' : 'asc',
-                                   'page' => 1,
-                               ])) }}">
+                            <a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), [
+        'sort' => 'price',
+        'direction' => $sort === 'price' && $direction === 'asc' ? 'desc' : 'asc',
+        'page' => 1,
+    ])) }}">
                                 Harga
                                 @if ($sort === 'price')
                                     {{ $direction === 'asc' ? '↑' : '↓' }}
@@ -498,12 +457,11 @@
                         </th>
 
                         <th>
-                            <a class="sort-link"
-                               href="{{ route('products.index', array_merge(request()->query(), [
-                                   'sort' => 'stock',
-                                   'direction' => $sort === 'stock' && $direction === 'asc' ? 'desc' : 'asc',
-                                   'page' => 1,
-                               ])) }}">
+                            <a class="sort-link" href="{{ route('products.index', array_merge(request()->query(), [
+        'sort' => 'stock',
+        'direction' => $sort === 'stock' && $direction === 'asc' ? 'desc' : 'asc',
+        'page' => 1,
+    ])) }}">
                                 Stok
                                 @if ($sort === 'stock')
                                     {{ $direction === 'asc' ? '↑' : '↓' }}
@@ -540,6 +498,7 @@
                                 @forelse ($product->suppliers as $supplier)
                                     <div>
                                         {{ $supplier->supplier_name }}
+
                                         @if ($supplier->pivot->is_primary)
                                             <span class="muted">(Utama)</span>
                                         @endif
@@ -579,25 +538,16 @@
                             @if (auth()->user()->isAdmin())
                                 <td>
                                     <div class="actions">
-                                        <a
-                                            href="{{ route('products.edit', $product) }}"
-                                            class="button button-small"
-                                        >
+                                        <a href="{{ route('products.edit', $product) }}" class="button button-small">
                                             Edit
                                         </a>
 
-                                        <form
-                                            method="POST"
-                                            action="{{ route('products.destroy', $product) }}"
-                                            onsubmit="return confirm('Yakin ingin menghapus produk ini? Produk yang memiliki histori stok tidak dapat dihapus.')"
-                                        >
+                                        <form method="POST" action="{{ route('products.destroy', $product) }}"
+                                            onsubmit="return confirm('Yakin ingin menghapus produk ini? Produk yang memiliki histori stok tidak dapat dihapus.')">
                                             @csrf
                                             @method('DELETE')
 
-                                            <button
-                                                type="submit"
-                                                class="button button-small button-danger"
-                                            >
+                                            <button type="submit" class="button button-small button-danger">
                                                 Hapus
                                             </button>
                                         </form>
@@ -607,10 +557,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td
-                                colspan="{{ auth()->user()->isAdmin() ? 7 : 6 }}"
-                                class="empty"
-                            >
+                            <td colspan="{{ auth()->user()->isAdmin() ? 7 : 6 }}" class="empty">
                                 <strong>
                                     @if (request('search') || request('category_id'))
                                         Produk tidak ditemukan
@@ -635,7 +582,7 @@
             <div class="pagination">
                 <span>
                     Menampilkan {{ $products->firstItem() ?? 0 }}
-                   –{{ $products->lastItem() ?? 0 }}
+                    –{{ $products->lastItem() ?? 0 }}
                     dari {{ $products->total() }} produk
                 </span>
 
@@ -671,6 +618,4 @@
     <p class="footer-note">
         Perubahan stok hanya dilakukan melalui transaksi barang masuk dan barang keluar.
     </p>
-</main>
-</body>
-</html>
+@endsection

@@ -1,49 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Kategori — InventarisPro</title>
+@section('title', 'Edit Kategori — InventarisPro')
 
+@push('styles')
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            background: #f5f7fa;
-            color: #172b43;
-            font-family: Inter, "Segoe UI", sans-serif;
-        }
-
-        header {
-            height: 68px;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .brand {
-            color: #01498b;
-            font-size: 19px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            color: #64748b;
-            font-size: 13px;
-        }
-
-        main {
+        .page-main {
             max-width: 920px;
             margin: 0 auto;
             padding: 32px 24px;
@@ -189,21 +150,8 @@
             background: #003b72;
         }
 
-        .logout {
-            padding: 8px 12px;
-            color: #334155;
-            background: #fff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
         @media (max-width: 600px) {
-            header {
-                padding: 0 16px;
-            }
-
-            main {
+            .page-main {
                 padding: 24px 14px;
             }
 
@@ -216,43 +164,26 @@
             }
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <header>
-        <a href="{{ route('dashboard') }}" class="brand">InventarisPro</a>
+@section('content')
+    <div class="breadcrumb">
+        Dashboard / Data Master / Kategori / Edit
+    </div>
 
-        <div class="user-area">
-            <span>{{ auth()->user()->full_name }}</span>
+    <h1>Edit Kategori</h1>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout">Keluar</button>
-            </form>
-        </div>
-    </header>
+    <p class="subtitle">
+        Perbarui informasi kategori yang sudah terdaftar.
+    </p>
 
-    <main>
-        <div class="breadcrumb">
-            Dashboard / Data Master / Kategori / Edit
-        </div>
+    <section class="form-panel">
+        <h2 class="panel-title">Informasi Kategori</h2>
 
-        <h1>Edit Kategori</h1>
-
-        <p class="subtitle">
-            Perbarui informasi kategori yang sudah terdaftar.
+        <p class="panel-description">
+            Perubahan nama dan deskripsi akan disimpan setelah dikonfirmasi.
         </p>
 
-        <section class="form-panel">
-            <h2 class="panel-title">Informasi Kategori</h2>
-
-            <p class="panel-description">
-                Perubahan nama dan deskripsi akan disimpan setelah dikonfirmasi.
-            </p>
-
-            @include('categories._form', ['category' => $category])
-        </section>
-    </main>
-</body>
-
-</html>
+        @include('categories._form', ['category' => $category])
+    </section>
+@endsection

@@ -1,49 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kategori — InventarisPro</title>
+@section('title', 'Kategori — InventarisPro')
 
+@push('styles')
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Inter, "Segoe UI", sans-serif;
-            background: #f5f7fa;
-            color: #172b43;
-        }
-
-        header {
-            height: 68px;
-            padding: 0 32px;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand {
-            color: #01498b;
-            font-size: 19px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        main {
+        .page-main {
             max-width: 1180px;
             margin: 0 auto;
             padding: 32px 24px;
@@ -90,6 +51,7 @@
             font: inherit;
             font-size: 13px;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         .button-primary {
@@ -133,7 +95,7 @@
             width: min(100%, 440px);
         }
 
-        input[type="search"] {
+        .search-form input[type="search"] {
             flex: 1;
             min-width: 0;
             height: 40px;
@@ -145,7 +107,7 @@
             font-size: 13px;
         }
 
-        input[type="search"]:focus {
+        .search-form input[type="search"]:focus {
             border-color: #01498b;
             box-shadow: 0 0 0 3px #01498b18;
         }
@@ -161,6 +123,7 @@
             margin-bottom: 18px;
             border-radius: 7px;
             font-size: 13px;
+            line-height: 1.6;
         }
 
         .alert-success {
@@ -271,6 +234,7 @@
             padding: 16px 20px;
             border-top: 1px solid #e2e8f0;
             font-size: 13px;
+            color: #64748b;
         }
 
         .pagination-links {
@@ -279,8 +243,8 @@
             gap: 6px;
         }
 
-        .pagination a,
-        .pagination span.page-current {
+        .pagination-links a,
+        .pagination-links span {
             display: inline-block;
             padding: 7px 10px;
             border: 1px solid #e2e8f0;
@@ -289,27 +253,14 @@
             color: #334155;
         }
 
-        .pagination span.page-current {
+        .pagination-links .page-current {
             color: #fff;
             background: #01498b;
             border-color: #01498b;
         }
 
-        .logout {
-            background: #fff;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 8px 12px;
-            cursor: pointer;
-            color: #334155;
-        }
-
         @media (max-width: 650px) {
-            header {
-                padding: 0 16px;
-            }
-
-            main {
+            .page-main {
                 padding: 24px 14px;
             }
 
@@ -327,220 +278,199 @@
                 width: 100%;
             }
 
-            .header-actions {
-                gap: 10px;
-            }
-
             .pagination {
                 align-items: flex-start;
                 flex-direction: column;
             }
         }
     </style>
-</head>
+@endpush
 
-<body>
-    <header>
-        <a href="{{ route('dashboard') }}" class="brand">
-            InventarisPro
-        </a>
+@section('content')
+    <div class="breadcrumb">
+        Dashboard / Data Master / Kategori
+    </div>
 
-        <div class="header-actions">
-            <span>{{ auth()->user()->full_name }}</span>
+    <div class="heading">
+        <div>
+            <h1>Kategori</h1>
+            <p class="subtitle">
+                Kelola kategori untuk mengelompokkan produk inventory.
+            </p>
+        </div>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout">Keluar</button>
+        @if (auth()->user()->isAdmin())
+            <a href="{{ route('categories.create') }}" class="button button-primary">
+                + Tambah Kategori
+            </a>
+        @endif
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success" role="status">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-error" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-error" role="alert">
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
+        </div>
+    @endif
+
+    <section class="panel">
+        <div class="toolbar">
+            <form action="{{ route('categories.index') }}" method="GET" class="search-form">
+
+                <input type="search" name="search" placeholder="Cari nama kategori..." value="{{ request('search') }}"
+                    aria-label="Cari kategori">
+
+                <button type="submit" class="button">
+                    Cari
+                </button>
+
+                @if (request('search'))
+                    <a href="{{ route('categories.index') }}" class="button">
+                        Reset
+                    </a>
+                @endif
             </form>
-        </div>
-    </header>
 
-    <main>
-        <div class="breadcrumb">
-            Dashboard / Data Master / Kategori
+            <span class="count">
+                {{ $categories->total() }} kategori
+            </span>
         </div>
 
-        <div class="heading">
-            <div>
-                <h1>Kategori</h1>
-                <p class="subtitle">
-                    Kelola kategori untuk mengelompokkan produk inventory.
-                </p>
-            </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nama Kategori</th>
+                        <th>Slug</th>
+                        <th>Deskripsi</th>
+                        <th>Jumlah Produk</th>
 
-            @if (auth()->user()->isAdmin())
-                <a href="{{ route('categories.create') }}" class="button button-primary">
-                    + Tambah Kategori
-                </a>
-            @endif
-        </div>
+                        @if (auth()->user()->isAdmin())
+                            <th>Aksi</th>
+                        @endif
+                    </tr>
+                </thead>
 
-        @if (session('success'))
-            <div class="alert alert-success" role="status">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-error" role="alert">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-error" role="alert">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
-
-        <section class="panel">
-            <div class="toolbar">
-                <form action="{{ route('categories.index') }}" method="GET" class="search-form">
-                    <input type="search" name="search" placeholder="Cari nama kategori..."
-                        value="{{ request('search') }}" aria-label="Cari kategori">
-
-                    <button type="submit" class="button">
-                        Cari
-                    </button>
-
-                    @if (request('search'))
-                        <a href="{{ route('categories.index') }}" class="button">
-                            Reset
-                        </a>
-                    @endif
-                </form>
-
-                <span class="count">
-                    {{ $categories->total() }} kategori
-                </span>
-            </div>
-
-            <div class="table-wrap">
-                <table>
-                    <thead>
+                <tbody>
+                    @forelse ($categories as $category)
                         <tr>
-                            <th>Nama Kategori</th>
-                            <th>Slug</th>
-                            <th>Deskripsi</th>
-                            <th>Jumlah Produk</th>
+                            <td>
+                                <span class="category-name">
+                                    {{ $category->category_name }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="slug">
+                                    {{ $category->slug ?: '-' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <div class="description">
+                                    {{ $category->description ?: 'Tidak ada deskripsi' }}
+                                </div>
+                            </td>
+
+                            <td>
+                                <span class="product-count">
+                                    {{ $category->products_count }}
+                                </span>
+                            </td>
+
                             @if (auth()->user()->isAdmin())
-                                <th>Aksi</th>
-                            @endif
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @forelse ($categories as $category)
-                            <tr>
                                 <td>
-                                    <span class="category-name">
-                                        {{ $category->category_name }}
-                                    </span>
-                                </td>
+                                    <div class="actions">
+                                        <a href="{{ route('categories.edit', $category) }}" class="button button-small">
+                                            Edit
+                                        </a>
 
-                                <td>
-                                    <span class="slug">
-                                        {{ $category->slug ?: '-' }}
-                                    </span>
-                                </td>
+                                        <form method="POST" action="{{ route('categories.destroy', $category) }}"
+                                            onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                                            @csrf
+                                            @method('DELETE')
 
-                                <td>
-                                    <div class="description">
-                                        {{ $category->description ?: 'Tidak ada deskripsi' }}
+                                            <button type="submit" class="button button-small button-danger">
+                                                Hapus
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
-
-                                <td>
-                                    <span class="product-count">
-                                        {{ $category->products_count }}
-                                    </span>
-                                </td>
-
-                                @if (auth()->user()->isAdmin())
-                                    <td>
-                                        <div class="actions">
-                                            <a href="{{ route('categories.edit', $category) }}" class="button button-small">
-                                                Edit
-                                            </a>
-
-                                            <form method="POST" action="{{ route('categories.destroy', $category) }}"
-                                                onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="button button-small button-danger">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                @endif
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="{{ auth()->user()->isAdmin() ? 5 : 4 }}" class="empty">
-                                    <strong>
-                                        @if (request('search'))
-                                            Kategori tidak ditemukan
-                                        @else
-                                            Belum ada kategori
-                                        @endif
-                                    </strong>
-
-                                    @if (request('search'))
-                                        Coba kata kunci pencarian lainnya.
-                                    @else
-                                        Tambahkan kategori untuk mulai
-                                        mengelompokkan produk.
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if ($categories->hasPages())
-                <div class="pagination">
-                    <span>
-                        Menampilkan {{ $categories->firstItem() ?? 0 }}
-                        –{{ $categories->lastItem() ?? 0 }}
-                        dari {{ $categories->total() }} kategori
-                    </span>
-
-                    <div class="pagination-links">
-                        @if ($categories->onFirstPage())
-                            <span>Sebelumnya</span>
-                        @else
-                            <a href="{{ $categories->previousPageUrl() }}">
-                                Sebelumnya
-                            </a>
-                        @endif
-
-                        @foreach ($categories->getUrlRange(1, $categories->lastPage()) as $page => $url)
-                            @if ($page === $categories->currentPage())
-                                <span class="page-current">
-                                    {{ $page }}
-                                </span>
-                            @else
-                                <a href="{{ $url }}">{{ $page }}</a>
                             @endif
-                        @endforeach
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="{{ auth()->user()->isAdmin() ? 5 : 4 }}" class="empty">
+                                <strong>
+                                    @if (request('search'))
+                                        Kategori tidak ditemukan
+                                    @else
+                                        Belum ada kategori
+                                    @endif
+                                </strong>
 
-                        @if ($categories->hasMorePages())
-                            <a href="{{ $categories->nextPageUrl() }}">
-                                Berikutnya
-                            </a>
+                                @if (request('search'))
+                                    Coba kata kunci pencarian lainnya.
+                                @else
+                                    Tambahkan kategori untuk mulai
+                                    mengelompokkan produk.
+                                @endif
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if ($categories->hasPages())
+            <div class="pagination">
+                <span>
+                    Menampilkan {{ $categories->firstItem() ?? 0 }}
+                    –{{ $categories->lastItem() ?? 0 }}
+                    dari {{ $categories->total() }} kategori
+                </span>
+
+                <div class="pagination-links">
+                    @if ($categories->onFirstPage())
+                        <span>Sebelumnya</span>
+                    @else
+                        <a href="{{ $categories->previousPageUrl() }}">
+                            Sebelumnya
+                        </a>
+                    @endif
+
+                    @foreach ($categories->getUrlRange(1, $categories->lastPage()) as $page => $url)
+                        @if ($page === $categories->currentPage())
+                            <span class="page-current">
+                                {{ $page }}
+                            </span>
                         @else
-                            <span>Berikutnya</span>
+                            <a href="{{ $url }}">{{ $page }}</a>
                         @endif
-                    </div>
-                </div>
-            @endif
-        </section>
-    </main>
-</body>
+                    @endforeach
 
-</html>
+                    @if ($categories->hasMorePages())
+                        <a href="{{ $categories->nextPageUrl() }}">
+                            Berikutnya
+                        </a>
+                    @else
+                        <span>Berikutnya</span>
+                    @endif
+                </div>
+            </div>
+        @endif
+    </section>
+@endsection
