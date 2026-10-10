@@ -110,7 +110,7 @@ Akun tersebut hanya untuk pengembangan dan demonstrasi lokal. Ganti password seb
 
 ## 6. Pengujian Otomatis
 
-Jalankan pengujian dengan perintah:
+Jalankan pengujian menggunakan perintah:
 
 ```bash
 php artisan test
