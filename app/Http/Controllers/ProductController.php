@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
     /**
      * Daftar produk dengan pencarian, filter, sorting, dan pagination.
-     * Staff dapat melihat produk, tetapi tidak mengubah data master.
      */
     public function index(Request $request)
     {
@@ -50,16 +51,8 @@ class ProductController extends Controller
 
                     $query->where(function ($subQuery) use ($search) {
                         $subQuery
-                            ->where(
-                                'product_name',
-                                'like',
-                                "%{$search}%"
-                            )
-                            ->orWhere(
-                                'sku',
-                                'like',
-                                "%{$search}%"
-                            );
+                            ->where('product_name', 'like', "%{$search}%")
+                            ->orWhere('sku', 'like', "%{$search}%");
                     });
                 }
             )
@@ -85,20 +78,24 @@ class ProductController extends Controller
     }
 
     /**
-     * Form tambah produk. Khusus admin.
+     * Form tambah produk.
      */
     public function create()
     {
         $this->authorizeAdmin();
 
         $categories = Category::orderBy('category_name')->get();
+        $suppliers = Supplier::orderBy('supplier_name')->get();
 
-        return view('products.create', compact('categories'));
+        return view('products.create', compact(
+            'categories',
+            'suppliers'
+        ));
     }
 
     /**
-     * Simpan produk baru.
-     * Stok awal selalu 0 dan tidak diisi langsung melalui form.
+     * Simpan produk baru beserta relasi pemasok.
+     * Stok awal tetap 0.
      */
     public function store(Request $request)
     {
@@ -123,20 +120,33 @@ class ProductController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'minimum_stock' => [
+            'minimum_stock' => ['required', 'integer', 'min:0'],
+            'expiry_date' => ['nullable', 'date'],
+
+            'supplier_ids' => ['nullable', 'array'],
+            'supplier_ids.*' => [
                 'required',
                 'integer',
-                'min:0',
+                'distinct',
+                Rule::exists('suppliers', 'supplier_id'),
             ],
-            'expiry_date' => [
-                'nullable',
-                'date',
-            ],
+            'supplier_selection_submitted' => ['nullable', 'boolean'],
         ]);
+
+        $supplierIds = $validated['supplier_ids'] ?? [];
+
+        unset(
+            $validated['supplier_ids'],
+            $validated['supplier_selection_submitted']
+        );
 
         $validated['stock'] = 0;
 
-        Product::create($validated);
+        DB::transaction(function () use ($validated, $supplierIds) {
+            $product = Product::create($validated);
+
+            $product->suppliers()->sync($supplierIds);
+        });
 
         return redirect()
             ->route('products.index')
@@ -154,15 +164,18 @@ class ProductController extends Controller
         $this->authorizeAdmin();
 
         $categories = Category::orderBy('category_name')->get();
+        $suppliers = Supplier::orderBy('supplier_name')->get();
 
         return view('products.edit', compact(
             'product',
-            'categories'
+            'categories',
+            'suppliers'
         ));
     }
 
     /**
-     * Perbarui informasi produk tanpa mengubah stok.
+     * Perbarui informasi produk dan relasi pemasok.
+     * Stok tidak boleh diubah melalui form edit.
      */
     public function update(Request $request, Product $product)
     {
@@ -188,19 +201,35 @@ class ProductController extends Controller
             ],
             'description' => ['nullable', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
-            'minimum_stock' => [
+            'minimum_stock' => ['required', 'integer', 'min:0'],
+            'expiry_date' => ['nullable', 'date'],
+
+            'supplier_ids' => ['nullable', 'array'],
+            'supplier_ids.*' => [
                 'required',
                 'integer',
-                'min:0',
+                'distinct',
+                Rule::exists('suppliers', 'supplier_id'),
             ],
-            'expiry_date' => [
-                'nullable',
-                'date',
-            ],
+            'supplier_selection_submitted' => ['nullable', 'boolean'],
         ]);
 
-        // Stok tidak boleh diubah melalui form edit produk.
-        $product->update($validated);
+        $supplierIds = $validated['supplier_ids'] ?? [];
+        $syncSuppliers = $request->boolean('supplier_selection_submitted');
+
+        unset(
+            $validated['supplier_ids'],
+            $validated['supplier_selection_submitted']
+        );
+
+        DB::transaction(function () use ($product, $validated, $supplierIds, $syncSuppliers) {
+            $product->update($validated);
+
+            // Perbarui relasi hanya saat form pemasok telah dikirim.
+            if ($syncSuppliers) {
+                $product->suppliers()->sync($supplierIds);
+            }
+        });
 
         return redirect()
             ->route('products.index')
@@ -231,7 +260,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Batasi perubahan data produk untuk admin.
+     * Batasi perubahan data produk untuk Admin.
      */
     private function authorizeAdmin(): void
     {

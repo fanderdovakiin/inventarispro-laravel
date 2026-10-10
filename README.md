@@ -119,17 +119,19 @@ php artisan test
 Pengujian otomatis mencakup:
 
 - Pengalihan pengunjung yang belum login ke halaman login.
-- Hak akses Admin dan Staff terhadap halaman data master.
-- Akses Staff ke halaman operasional stok.
-- Login dengan kredensial yang valid dan penolakan password yang salah.
+- Login menggunakan kredensial valid dan penolakan password yang salah.
 - Logout pengguna.
+- Hak akses Admin dan Staff terhadap halaman pengelolaan data master.
+- Akses Staff ke halaman operasional stok.
 - Transaksi barang masuk dan pencatatan riwayat stok.
 - Transaksi barang keluar dan pencatatan riwayat stok.
 - Penolakan transaksi barang keluar yang melebihi stok tersedia.
+- Pembuatan produk dengan beberapa pemasok.
+- Perubahan relasi pemasok tanpa mengubah stok produk.
 
-**Hasil pengujian otomatis terakhir: 11 passed, 0 failed.**
+**Hasil pengujian otomatis terakhir: 13 passed, 0 failed (49 assertions).**
 
-Pengujian tersebut mencakup alur yang disebutkan di atas, bukan seluruh kemungkinan kasus pada setiap fitur aplikasi.
+Pengujian ini mencakup alur yang disebutkan di atas, bukan seluruh kemungkinan kasus pada setiap fitur aplikasi.
 
 ## 7. Catatan Keamanan
 

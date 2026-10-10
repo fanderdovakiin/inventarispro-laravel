@@ -1,5 +1,17 @@
 @php
     $product = $product ?? null;
+
+    $selectedSupplierIds = old(
+        'supplier_ids',
+        $product
+        ? $product->suppliers->pluck('supplier_id')->all()
+        : []
+    );
+
+    $selectedSupplierIds = array_map(
+        'strval',
+        (array) $selectedSupplierIds
+    );
 @endphp
 
 @if ($errors->any())
@@ -13,6 +25,7 @@
 @endif
 
 <form method="POST" action="{{ $product ? route('products.update', $product) : route('products.store') }}">
+
     @csrf
 
     @if ($product)
@@ -107,11 +120,65 @@
                 <small class="field-error">{{ $message }}</small>
             @enderror
         </div>
+
+        <div class="field field-full">
+            <label>Pemasok Produk</label>
+
+            {{-- Menandakan bahwa bagian pemasok dikirim oleh form. --}}
+            <input type="hidden" name="supplier_selection_submitted" value="1">
+
+            <div
+                style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin-top:10px;">
+                @forelse ($suppliers as $supplier)
+                    <label for="supplier_{{ $supplier->supplier_id }}"
+                        style="display:flex; align-items:flex-start; gap:10px; margin:0; padding:13px; border:1px solid #dce3ec; border-radius:9px; cursor:pointer; font-weight:400;">
+                        <input type="checkbox" id="supplier_{{ $supplier->supplier_id }}" name="supplier_ids[]"
+                            value="{{ $supplier->supplier_id }}" @checked(
+                                in_array(
+                                    (string) $supplier->supplier_id,
+                                    $selectedSupplierIds,
+                                    true
+                                )
+                            ) style="width:auto; margin-top:3px; flex-shrink:0;">
+
+                        <span>
+                            <strong style="display:block; margin-bottom:4px;">
+                                {{ $supplier->supplier_name }}
+                            </strong>
+
+                            @if ($supplier->email)
+                                <small style="display:block; color:#718096; font-weight:400;">
+                                    {{ $supplier->email }}
+                                </small>
+                            @elseif ($supplier->phone)
+                                <small style="display:block; color:#718096; font-weight:400;">
+                                    {{ $supplier->phone }}
+                                </small>
+                            @endif
+                        </span>
+                    </label>
+                @empty
+                    <p style="color:#718096; font-size:14px;">
+                        Belum ada pemasok. Tambahkan data pemasok terlebih dahulu.
+                    </p>
+                @endforelse
+            </div>
+
+            <small style="display:block; margin-top:9px; color:#718096;">
+                Pilih satu atau beberapa pemasok yang menyediakan produk ini.
+                Bagian ini boleh dikosongkan.
+            </small>
+
+            @error('supplier_ids')
+                <small class="field-error">{{ $message }}</small>
+            @enderror
+        </div>
     </div>
 
     <div class="stock-note">
         @if ($product)
-            Stok saat ini: <strong>{{ number_format($product->stock) }}</strong> unit.
+            Stok saat ini:
+            <strong>{{ number_format($product->stock) }}</strong> unit.
             Perubahan stok harus dilakukan melalui transaksi barang masuk atau keluar.
         @else
             Stok awal produk akan diatur menjadi 0. Gunakan transaksi barang masuk
